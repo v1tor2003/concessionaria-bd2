@@ -2,7 +2,17 @@ import database from "@/database/database"
 import NextAuth from "next-auth"
 import CredentialsProvider  from "next-auth/providers/credentials"
 
+type Func = {
+  id_func: string
+  usuario_func: string
+  cargo_func: string
+  id_detalhepessoa_fk: number
+}
+
 const handler = NextAuth({
+  pages: {
+    signIn: '/login'
+  },
   providers: [
     CredentialsProvider({
       type: 'credentials',
@@ -21,12 +31,12 @@ const handler = NextAuth({
         if(results.length === 0) return null
         // @ts-expect-error
         const func = await results[0]
-
+        // fazer join entre func e detalhepessoa
         const user = {
           id: (func.id_func).toString(),
           name: (func.usuario_func),
         }
-        return {...user, role: 'adm'}
+        return {...user, role: 'normal'}
       }
     })
   ],
