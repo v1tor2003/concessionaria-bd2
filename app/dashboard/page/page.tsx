@@ -16,6 +16,7 @@ export default function Page() {
   useEffect(() => {
     fetch('/api/getData')
       .then(response => {
+        console.log(response.json())
         if (!response.ok) {
           throw new Error('Failed to fetch data');
         }

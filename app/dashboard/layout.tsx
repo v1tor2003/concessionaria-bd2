@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <div className="flex flex-col h-dvh">
       <NavBar />
-      <main>{children}</main>
+      <main className="flex items-center justify-center">{children}</main>
     </div>
   );
 }

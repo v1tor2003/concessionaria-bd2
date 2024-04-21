@@ -6,7 +6,6 @@ type Func = {
   id_func: string
   usuario_func: string
   cargo_func: string
-  id_detalhepessoa_fk: number
 }
 
 const handler = NextAuth({
@@ -26,17 +25,34 @@ const handler = NextAuth({
           password: string
         }
 
-        const [results, fields] = await database.execute('SELECT * FROM funcionario WHERE usuario_func = ? AND senha_func = ?', [username, password])
+        let [results, fields] = await database.execute('SELECT * FROM funcionario WHERE usuario_func = ? AND senha_func = ?', [username, password])
         // @ts-expect-error
         if(results.length === 0) return null
         // @ts-expect-error
-        const func = await results[0]
+        const id_func = results[0].id_func
+        const [func] = await database
+              .execute(`SELECT 
+                  funcionario.id_func, 
+                  funcionario.cargo_func,
+                  detalhespessoa.nome_pessoa
+                FROM
+                  funcionario
+                JOIN
+                  detalhespessoa ON funcionario.id_detalhepessoa_fk = detalhespessoa.id_detalhepessoa
+                WHERE
+                  funcionario.id_func = ?`, [id_func])
+      
         // fazer join entre func e detalhepessoa
+
         const user = {
-          id: (func.id_func).toString(),
-          name: (func.usuario_func),
+          // @ts-expect-error
+          id: (func[0].id_func).toString(),
+          // @ts-expect-error
+          name: func[0].usuario_func,
+          // @ts-expect-error
+          role: func[0].cargo_func
         }
-        return {...user, role: 'normal'}
+        return {...user}
       }
     })
   ],
