@@ -1,10 +1,20 @@
 import database from "@/database/database"
+import { RowDataPacket } from "mysql2"
 import NextAuth from "next-auth"
 import CredentialsProvider  from "next-auth/providers/credentials"
 
-type Func = {
-  id_func: string
+export interface Func extends RowDataPacket {
+  id_func: string        
   usuario_func: string
+  senha_func: string
+  salario_func:number
+  cargo_func : string        
+  id_detalhepessoa_fk: number
+}
+
+export interface FuncDetails extends RowDataPacket {
+  id_func: string
+  nome_pessoa: string
   cargo_func: string
 }
 
@@ -25,33 +35,37 @@ const handler = NextAuth({
           password: string
         }
 
-        let [results, fields] = await database.execute('SELECT * FROM funcionario WHERE usuario_func = ? AND senha_func = ?', [username, password])
-        // @ts-expect-error
-        if(results.length === 0) return null
-        // @ts-expect-error
-        const id_func = results[0].id_func
-        const [func] = await database
-              .execute(`SELECT 
-                  funcionario.id_func, 
-                  funcionario.cargo_func,
-                  detalhespessoa.nome_pessoa
-                FROM
-                  funcionario
-                JOIN
-                  detalhespessoa ON funcionario.id_detalhepessoa_fk = detalhespessoa.id_detalhepessoa
-                WHERE
-                  funcionario.id_func = ?`, [id_func])
-      
-        // fazer join entre func e detalhepessoa
+        let [rows] = await 
+        database.execute<Func[]>(`
+            SELECT * 
+            FROM funcionario 
+            WHERE usuario_func = ? AND senha_func = ?`
+        , [username, password])
 
+        if(rows.length === 0) return null
+        
+        const id_func = rows[0].id_func
+        let [func] = await 
+        database.execute<FuncDetails[]>(`
+            SELECT 
+              funcionario.id_func, 
+              funcionario.cargo_func,
+              detalhespessoa.nome_pessoa
+            FROM
+              funcionario
+            JOIN
+              detalhespessoa ON funcionario.id_detalhepessoa_fk = detalhespessoa.id_detalhepessoa
+            WHERE
+              funcionario.id_func = ?`
+        , [id_func])
+        
         const user = {
-          // @ts-expect-error
           id: (func[0].id_func).toString(),
-          // @ts-expect-error
-          name: func[0].usuario_func,
-          // @ts-expect-error
+          name: func[0].nome_pessoa,
           role: func[0].cargo_func
         }
+
+        console.log('func', user)
         return {...user}
       }
     })

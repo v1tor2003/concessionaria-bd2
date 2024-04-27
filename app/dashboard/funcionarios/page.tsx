@@ -1,20 +1,21 @@
 'use client'
+import { FuncInfo } from "@/app/api/getFuncionarios/route"
+import Modal from "@/app/components/Modal"
 import { useEffect, useState } from "react"
-
-type Func = {
-  id_func: number,
-  usuario_func: string,
-  senha_func: string,
-  salario_func: number,
-  cargo_func: string,
-  id_detalhepessoa_fk: number
-}
+import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 
 export default function Funcionarios() {
+  const tableLabels = [
+    'Id', 'Nome', 'Cargo', 'Salario','Ações'
+  ]
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | undefined>(undefined)
-  const [funcionarios, setFuncionarios] = useState<Func[]>([])
-  
+  const [funcionarios, setFuncionarios] = useState<FuncInfo[]>([])
+  const [isOpen, setIsOpen] = useState<boolean>(false)
+
+  const showModal = () => setIsOpen(true)
+  const closeModal = () => setIsOpen(false)
+
   useEffect(() => {
     fetch('/api/getFuncionarios')
       .then(response => {
@@ -23,9 +24,9 @@ export default function Funcionarios() {
         }
         return response.json();
       })
-      .then(({ results }) => {
-        console.log(results)
-        setFuncionarios(results);
+      .then(({ rows }) => {
+        console.log(rows)
+        setFuncionarios(rows);
         setLoading(false);
       })
       .catch(error => {
@@ -38,9 +39,17 @@ export default function Funcionarios() {
   if(error) return (<h1>Error: {error}</h1>)
 
   return (
-      <div className="flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6">
-        <div className="w-full text-left">
+    <>
+      <Modal isOpen={isOpen} closeModal={closeModal} label="Criar Funcionário">
+        <h1>penis</h1>
+      </Modal>
+      <div className={`${isOpen ? 'blur-sm': ''} flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6`}>
+        <div className="flex w-full text-left justify-between">
           <h1 className="text-2xl font-bold">Funcionários:</h1>
+          <button onClick={showModal} className="mr-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+            Criar
+          </button>
+          
         </div>
         <div className="w-full overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block justify-center items-center min-w-full py-2 sm:px-6 lg:px-8">
@@ -48,37 +57,31 @@ export default function Funcionarios() {
               <table className="min-w-full items-center justify-center text-center text-sm font-light">
                 <thead className="border-b font-medium dark:border-neutral-500">
                   <tr>
-                    <th scope="col" className="px-6 py-4">#</th>
-                    <th scope="col" className="px-6 py-4">First</th>
-                    <th scope="col" className="px-6 py-4">Last</th>
-                    <th scope="col" className="px-6 py-4">Handle</th>
+                    {tableLabels.map(label =><th scope="col" className="px-6 py-4">{label}</th> )}
                   </tr>
                 </thead>
                 <tbody>
-                  <tr className="border-b dark:border-neutral-500">
-                    <td className="whitespace-nowrap px-6 py-4 font-medium">1</td>
-                    <td className="whitespace-nowrap px-6 py-4">Mark</td>
-                    <td className="whitespace-nowrap px-6 py-4">Otto</td>
-                    <td className="whitespace-nowrap px-6 py-4">@mdo</td>
-                  </tr>
-                  <tr className="border-b dark:border-neutral-500">
-                    <td className="whitespace-nowrap px-6 py-4 font-medium">2</td>
-                    <td className="whitespace-nowrap px-6 py-4">Jacob</td>
-                    <td className="whitespace-nowrap px-6 py-4">Thornton</td>
-                    <td className="whitespace-nowrap px-6 py-4">@fat</td>
-                  </tr>
-                  <tr className="border-b dark:border-neutral-500">
-                    <td className="whitespace-nowrap px-6 py-4 font-medium">3</td>
-                    <td className="whitespace-nowrap px-6 py-4">Larry</td>
-                    <td className="whitespace-nowrap px-6 py-4">Wild</td>
-                    <td className="whitespace-nowrap px-6 py-4">@twitter</td>
-                  </tr>
+                  {funcionarios.map((func) => 
+                      <tr className="border-b dark:border-neutral-500">
+                        <td className="whitespace-nowrap px-6 py-4 font-medium">{func.id_func}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{func.nome_pessoa}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{func.cargo_func}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{func.salario_func}</td>
+                        <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
+                          <FaPencilAlt onClick={showModal} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
+                          <FaTrashAlt className="hover:cursor-pointer" style={{ color: 'red' }}/>
+                        </td>
+                      </tr>
+                    )}
                 </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
-  );
+ 
+    
+    </>
+  )
     
 }
