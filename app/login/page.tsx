@@ -1,24 +1,28 @@
 'use client'
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import Image from "next/image"
 import logo from '@/public/Mallocar_Logo.svg'
 import Link from "next/link"
+import { signIn } from "next-auth/react"
 
 export default function Login() {
   const [error, setError] = useState<string>('')
 
-  function login(formData: FormData){
+  async function login(formData: FormData){
     const data = {
-      username: formData.get('username') as string,
-      password: formData.get('password') as string
+        username: formData.get('username') as string,
+        password: formData.get('password') as string
     }
-    
-    signIn('credentials', {
-      ...data,
-      callbackUrl: "/dashboard/page"
+    try {
+      signIn('credentials', {
+        ...data,
+        callbackUrl: "/dashboard/page"
     })
+    } catch (error: unknown) {
+      setError('Error: ' + error)
+    }
   }
+
   return (
     <section className="flex justify-center items-center  bg-accb-green w-dvh h-lvh">
       <div className="flex flex-col items-center justify-center w-screen h-screen md:w-80 md:h-[32rem] transition-all md:transition-all rounded-md bg-gray-100 ">

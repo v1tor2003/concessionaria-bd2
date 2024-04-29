@@ -1,5 +1,6 @@
 import { FieldError, UseFormRegister } from "react-hook-form";
 import { z } from "zod"
+import formatDate from "../lib/utils";
 
 interface Props {
   values: any
@@ -33,7 +34,7 @@ export default function RenderFormFields<T extends z.ZodRawShape>({values, place
         <input
           type={type}
           placeholder={placeholders.get(fieldName)}
-          defaultValue={values[fieldName]}
+          defaultValue={type === 'date' ? formatDate(values[fieldName]) : values[fieldName]}
           className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
           {...register(fieldName)}
         />

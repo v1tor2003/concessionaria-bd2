@@ -29,6 +29,7 @@ export default function Funcionarios() {
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [data, setData] = useState<Inputs>()
+  const [toUpdateId, setTuUpdateId] = useState<string>('')
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddFuncSchema)
@@ -37,11 +38,13 @@ export default function Funcionarios() {
   const processAdd: SubmitHandler<Inputs> = async (data) => {
     await addFunc(data)
     reset()
+    closeModal()
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
-    await editFunc(data)
+    await editFunc(toUpdateId, data)
     reset()
+    closeEditModal()
   }
 
   const showModal = () => setIsOpen(true)
@@ -49,6 +52,7 @@ export default function Funcionarios() {
     const func = await getFuncById(id)
     console.log(func)
     if(func){
+      setTuUpdateId(func.id_func)
       setData({
         nome: func.nome_pessoa,
         nascimeto: new Date(func.nascimento_pessoa),
@@ -113,7 +117,7 @@ export default function Funcionarios() {
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>
-      <div className={`${isOpen ? 'blur-sm': ''} flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6`}>
+      <div className={`${isOpen || isEditOpen ? 'blur-sm': ''} flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6`}>
         <div className="flex w-full text-left justify-between">
           <h1 className="text-2xl font-bold">Funcionários:</h1>
           <button onClick={showModal} className="mr-4 bg-[#3a0039] hover:opacity-75 text-white font-bold py-2 px-4 rounded">

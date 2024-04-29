@@ -34,8 +34,13 @@ export async function addFunc(data: Inputs) {
   return { success: true, data: result.data }
 }
 
-export async function editFunc(data: Inputs){
+export async function editFunc(id: string, data: Inputs){
+  console.log(id, data)
+  try {
 
+  } catch (error: unknown) {
+    console.log(error)
+  }
 }
 
 export async function getFuncById(id: string): Promise<FuncDetails | undefined> {
