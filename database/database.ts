@@ -17,12 +17,24 @@ async function connect(credentials: mysql.ConnectionOptions): Promise<mysql.Conn
   })
 }
 
-if(process.env.NODE_ENV === "production"){
-  database = await connect(dbCredentials)
+async function main(): Promise<void>{
+  if(process.env.NODE_ENV === "production"){
+    database = await connect(dbCredentials)
+  }
+  else {
+    if(!global.database) global.database = await connect(dbCredentials)
+    database = global.database
+  }
 }
-else {
-  if(!global.database) global.database = await connect(dbCredentials)
-  database = global.database
-}
+
+
+main()
+  .then(() => {console.log('Database connected')})
+  .catch((e: unknown) => {
+    console.log(e)
+    process.exit(1)
+  })
+
+
 
 export default database

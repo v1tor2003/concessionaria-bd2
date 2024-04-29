@@ -2,19 +2,76 @@
 import { FuncInfo } from "@/app/api/getFuncionarios/route"
 import Modal from "@/app/components/Modal"
 import { useEffect, useState } from "react"
+import { SubmitHandler, useForm } from "react-hook-form"
+import { zodResolver } from '@hookform/resolvers/zod'
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
+import { addFunc, editFunc, getFuncById } from "./funcActions"
+import { z } from "zod"
+import { FormAddFuncSchema } from "@/app/lib/schema"
+import RenderFormFields from "@/app/components/RenderFormFields"
+
+export type Inputs = z.infer<typeof FormAddFuncSchema>
 
 export default function Funcionarios() {
   const tableLabels = [
     'Id', 'Nome', 'Cargo', 'Salario','Ações'
   ]
+  const AddFormPlaceholders = new Map()
+  AddFormPlaceholders.set('nome', 'Joao')
+  AddFormPlaceholders.set('usuario', 'joao123')
+  AddFormPlaceholders.set('senha', '****')
+  AddFormPlaceholders.set('salario', '1000.00')
+  AddFormPlaceholders.set('tel', '(xx) xxxx-xxxx')
+
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | undefined>(undefined)
   const [funcionarios, setFuncionarios] = useState<FuncInfo[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
+  const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
+  const [data, setData] = useState<Inputs>()
+
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+    resolver: zodResolver(FormAddFuncSchema)
+  })
+  
+  const processAdd: SubmitHandler<Inputs> = async (data) => {
+    await addFunc(data)
+    reset()
+  }
+
+  const processEdit: SubmitHandler<Inputs> = async (data) => {
+    await editFunc(data)
+    reset()
+  }
 
   const showModal = () => setIsOpen(true)
+  const showEditModal = async (id: string) => {
+    const func = await getFuncById(id)
+    console.log(func)
+    if(func){
+      setData({
+        nome: func.nome_pessoa,
+        nascimeto: new Date(func.nascimento_pessoa),
+        tel: func.phone_pessoa,
+        usuario: func.usuario_func,
+        senha: func.senha_func,
+        salario:  func.salario_func,
+        cargo: func.cargo_func
+      })
+      reset({
+        nome: func.nome_pessoa,
+        nascimeto: new Date(func.nascimento_pessoa),
+        tel: func.phone_pessoa,
+        usuario: func.usuario_func,
+        senha: func.senha_func,
+        salario:  func.salario_func,
+        cargo: func.cargo_func
+      })
+    }
+    setIsEditOpen(true)
+  }
   const closeModal = () => setIsOpen(false)
+  const closeEditModal = () => setIsEditOpen(false)
 
   useEffect(() => {
     fetch('/api/getFuncionarios')
@@ -41,12 +98,25 @@ export default function Funcionarios() {
   return (
     <>
       <Modal isOpen={isOpen} closeModal={closeModal} label="Criar Funcionário">
-        <h1>penis</h1>
+        <form 
+        onSubmit={handleSubmit(processAdd)}
+        className="grid grid-cols-2 gap-2">
+          <RenderFormFields register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
+          <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Criar</button>
+        </form>
+      </Modal>
+      <Modal isOpen={isEditOpen} closeModal={closeEditModal} label="Editar Funcionário">
+        <form 
+        onSubmit={handleSubmit(processEdit)}
+        className="grid grid-cols-2 gap-2">
+          <RenderFormFields values={data} register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
+          <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
+        </form>
       </Modal>
       <div className={`${isOpen ? 'blur-sm': ''} flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6`}>
         <div className="flex w-full text-left justify-between">
           <h1 className="text-2xl font-bold">Funcionários:</h1>
-          <button onClick={showModal} className="mr-4 bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          <button onClick={showModal} className="mr-4 bg-[#3a0039] hover:opacity-75 text-white font-bold py-2 px-4 rounded">
             Criar
           </button>
           
@@ -57,18 +127,18 @@ export default function Funcionarios() {
               <table className="min-w-full items-center justify-center text-center text-sm font-light">
                 <thead className="border-b font-medium dark:border-neutral-500">
                   <tr>
-                    {tableLabels.map(label =><th scope="col" className="px-6 py-4">{label}</th> )}
+                    {tableLabels.map(label =><th key={label} scope="col" className="px-6 py-4">{label}</th> )}
                   </tr>
                 </thead>
                 <tbody>
                   {funcionarios.map((func) => 
-                      <tr className="border-b dark:border-neutral-500">
+                      <tr key={func.id_func} className="border-b dark:border-neutral-500">
                         <td className="whitespace-nowrap px-6 py-4 font-medium">{func.id_func}</td>
                         <td className="whitespace-nowrap px-6 py-4">{func.nome_pessoa}</td>
                         <td className="whitespace-nowrap px-6 py-4">{func.cargo_func}</td>
                         <td className="whitespace-nowrap px-6 py-4">{func.salario_func}</td>
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
-                          <FaPencilAlt onClick={showModal} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
+                          <FaPencilAlt onClick={async () => showEditModal(func.id_func)} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
                           <FaTrashAlt className="hover:cursor-pointer" style={{ color: 'red' }}/>
                         </td>
                       </tr>
@@ -79,8 +149,6 @@ export default function Funcionarios() {
           </div>
         </div>
       </div>
- 
-    
     </>
   )
     

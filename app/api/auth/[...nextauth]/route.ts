@@ -1,22 +1,7 @@
+import { Func, FuncDetails } from "@/app/lib/types"
 import database from "@/database/database"
-import { RowDataPacket } from "mysql2"
 import NextAuth from "next-auth"
 import CredentialsProvider  from "next-auth/providers/credentials"
-
-export interface Func extends RowDataPacket {
-  id_func: string        
-  usuario_func: string
-  senha_func: string
-  salario_func:number
-  cargo_func : string        
-  id_detalhepessoa_fk: number
-}
-
-export interface FuncDetails extends RowDataPacket {
-  id_func: string
-  nome_pessoa: string
-  cargo_func: string
-}
 
 const handler = NextAuth({
   pages: {
