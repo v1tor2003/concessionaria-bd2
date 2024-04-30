@@ -72,7 +72,7 @@ export default function Vendas() {
     
     if(sell){
       setSelectedId(sell.id_venda.toString())
-      setData({})
+      //setData()
       reset({})
     }
     setIsEditOpen(true)

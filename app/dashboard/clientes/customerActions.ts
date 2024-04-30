@@ -59,6 +59,19 @@ export async function getCustomerById(id: string): Promise<Cliente | undefined> 
   return undefined
 }
 
+export async function getCustomerByName(name: string): Promise<Cliente[] | undefined> {
+  try {
+    const [rows] = await database.execute<Cliente[]>(`
+      SELECT * FROM clientes 
+      WHERE nome_pessoa LIKE ?
+    `, [`%${name}%`])
+    return rows.length !== 0 ? rows : undefined
+  } catch (error) {
+    console.log(error)
+  }
+  return undefined
+}
+
 
 export async function deleteCustomer(id: string) {
   try {

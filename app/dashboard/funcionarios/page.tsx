@@ -1,5 +1,4 @@
 'use client'
-import { FuncInfo } from "@/app/api/getFuncionarios/route"
 import Modal from "@/app/components/Modal"
 import { useEffect, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -9,6 +8,7 @@ import { addFunc, deleteFunc, editFunc, getFuncById } from "./funcActions"
 import { z } from "zod"
 import { FormAddFuncSchema } from "@/app/lib/schema"
 import RenderFormFields from "@/app/components/RenderFormFields"
+import { FuncInfo } from "@/app/lib/types"
 
 export type Inputs = z.infer<typeof FormAddFuncSchema>
 

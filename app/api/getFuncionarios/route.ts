@@ -1,11 +1,5 @@
+import { FuncInfo } from "@/app/lib/types"
 import database from "@/database/database"
-import { RowDataPacket } from "mysql2"
-export interface FuncInfo extends RowDataPacket {
-  id_func: string
-  cargo_func: string
-  nome_pessoa: string
-  salario_func: number
-}
 
 export async function GET() {
   const [rows] = await 

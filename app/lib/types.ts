@@ -1,5 +1,12 @@
 import { RowDataPacket } from "mysql2"
 
+export interface FuncInfo extends RowDataPacket {
+  id_func: string
+  cargo_func: string
+  nome_pessoa: string
+  salario_func: number
+}
+
 export interface Func extends RowDataPacket {
   id_func: string        
   usuario_func: string
@@ -36,10 +43,10 @@ export interface Cor extends RowDataPacket {
   preco_cor: number
 }
 
-export interface Cliente extends Details {
+export interface Cliente extends RowDataPacket {
   id_cliente: number
 }
-
+export interface Cliente extends Details{}
 export interface Venda extends RowDataPacket {
   id_venda: number
   data_venda: string
