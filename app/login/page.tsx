@@ -16,7 +16,7 @@ export default function Login() {
     try {
       signIn('credentials', {
         ...data,
-        callbackUrl: "/dashboard/page"
+        callbackUrl: "/dashboard/carros"
     })
     } catch (error: unknown) {
       setError('Error: ' + error)

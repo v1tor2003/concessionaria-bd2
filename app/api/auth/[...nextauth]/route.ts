@@ -35,6 +35,7 @@ const handler = NextAuth({
             SELECT 
               funcionario.id_func, 
               funcionario.cargo_func,
+              funcionario.usuario_func,
               detalhespessoa.nome_pessoa
             FROM
               funcionario
@@ -47,25 +48,34 @@ const handler = NextAuth({
         const user = {
           id: (func[0].id_func).toString(),
           name: func[0].nome_pessoa,
+          username: func[0].usuario_func,
           role: func[0].cargo_func
         }
 
         console.log('func', user)
-        return {...user}
+        return user
       }
     })
   ],
   callbacks: {
     // we can add properties from the user to the token
     async jwt({token, user}){
-      // @ts-expect-error
-      if(user) token.role = user.role
+      if(user){
+        // @ts-expect-error
+        token.role = user.role
+        // @ts-expect-error
+        token.username = user.username
+      } 
       return token
     },
     // we can add properties from the token to the session
     async session({session, token}){
-      // @ts-expect-error
-      if(session?.user) session.user.role = token.role
+      if(session?.user){
+        // @ts-expect-error
+        session.user.role = token.role
+        // @ts-expect-error
+        session.user.username = token.username
+      }
       return session
     },
   }

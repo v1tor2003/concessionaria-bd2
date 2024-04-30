@@ -1,8 +1,11 @@
-import { FieldError, UseFormRegister } from "react-hook-form";
+'use client'
+import { FieldError, UseFormRegister } from "react-hook-form"
 import { z } from "zod"
-import { Cor } from "../lib/types";
+import { Cor, Func } from "../lib/types"
+import { useSession } from "next-auth/react"
 
 interface Props {
+  funcs?: Func[]
   colors?: Cor[]
   values: any
   placeholders: Map<string, string>
@@ -20,7 +23,8 @@ function formatDate(date: Date): String | undefined {
 }
 
 
-export default function RenderFormFields<T extends z.ZodRawShape>({ colors, values, placeholders, register, errors, schema }: Props) {
+export default function RenderFormFields<T extends z.ZodRawShape>({ funcs,colors, values, placeholders, register, errors, schema }: Props) {
+  const {data:session} = useSession()
   return Object.entries(schema.shape).map(([fieldName, field]) => {
     const type = field._def.typeName.replace('Zod', '').toLowerCase();
 
@@ -71,6 +75,40 @@ export default function RenderFormFields<T extends z.ZodRawShape>({ colors, valu
           >
             {colors && colors.map((color) => <option key={color.nome_cor} value={color.nome_cor}>{color.nome_cor}</option>)}
           </select>
+          {errors[fieldName] && (
+            <p className="text-sm text-red-400">{errors[fieldName].message}</p>
+          )}
+        </div>
+      ) 
+    }
+
+    if (fieldName === 'funcionario') {
+      if(funcs && !session?.user?.name)
+        return (
+          <div className="flex flex-col" key={fieldName}>
+            <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
+            <select 
+              {...register(fieldName, { value: values[fieldName]})}
+              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
+            >
+              {funcs && funcs.map((func) => <option key={func.usuario_func} value={func.usuario_func}>{func.nome_pessoa} ({func.usuario_func})</option>)}
+            </select>
+            {errors[fieldName] && (
+              <p className="text-sm text-red-400">{errors[fieldName].message}</p>
+            )}
+          </div>
+        ) 
+      else if (session?.user?.name)
+      return (
+        <div className="flex flex-col" key={fieldName}>
+          <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
+          <input
+            type={type}
+            disabled={true}
+            defaultValue={session?.user?.name} 
+            className="border disabled:bg-gray-200 border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
+            {...register(fieldName)}
+            />
           {errors[fieldName] && (
             <p className="text-sm text-red-400">{errors[fieldName].message}</p>
           )}

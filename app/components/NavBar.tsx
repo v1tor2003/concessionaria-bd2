@@ -53,7 +53,8 @@ export default function Navbar () {
                       {options.map((op) => 
                         <Link className="rounded my-2 py-5 px-3 text-[#3a0039] hover:bg-[#3a0039] hover:text-gray-100" key={op.label} href={op.url}>{op.label}</Link>
                       )}
-                      <button className='rounded py-5 px-3 text-red-500 hover:text-gray-200 hover:bg-red-500' onClick={() => signOut({callbackUrl: url})}>Sair</button>
+                      <p className='text-[#3a0039] font-semibold'>oi, {session?.user?.name?.split(' ')[0]}</p>
+                      <button className='font-semibold rounded py-5 px-3 text-red-500 hover:text-gray-200 hover:bg-red-500' onClick={() => signOut({callbackUrl: url})}>Sair</button>
                     </div>
 
                     {/* Mobile menu button */}

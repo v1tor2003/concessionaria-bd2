@@ -53,7 +53,7 @@ export default function Funcionarios() {
     closeEditModal()
   }
 
-  const showModal = () => setIsOpen(true)
+  const showModal = () => {setIsOpen(true)}
   const showEditModal = async (id: string) => {
     const func = await getFuncById(id)
     
@@ -62,6 +62,14 @@ export default function Funcionarios() {
       setData({
         nome: func.nome_pessoa,
         nascimeto: new Date(func.nascimento_pessoa),
+        tel: func.phone_pessoa,
+        usuario: func.usuario_func,
+        senha: func.senha_func,
+        salario:  func.salario_func,
+        cargo: func.cargo_func
+      })
+      reset({
+        nome: func.nome_pessoa,
         tel: func.phone_pessoa,
         usuario: func.usuario_func,
         senha: func.senha_func,
@@ -98,7 +106,7 @@ export default function Funcionarios() {
       });
   }, [])
 
-  if(loading) return (<h1>Carregando...</h1>)
+  if(loading) return (<h1>Carregando Funcionários...</h1>)
   if(error) return (<h1>Error: {error}</h1>)
 
   return (

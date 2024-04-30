@@ -7,15 +7,14 @@ import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
 import { z } from "zod"
 import { FormAddCarSchema } from "@/app/lib/schema"
 import RenderFormFields from "@/app/components/RenderFormFields"
-import { Carro } from "@/app/api/getCarros/route"
 import { addCar, editCar, getCarById, deleteCar } from "./carActions"
-import { Cor } from "@/app/lib/types"
+import { Carro, Cor } from "@/app/lib/types"
 
 export type Inputs = z.infer<typeof FormAddCarSchema>
 
 export default function Carros() {
   const tableLabels = [
-    'Id', 'Modelo', 'Ano','Preco', 'Cor','Versao', 'Quantidade', 'Ações'
+    'Id', 'Modelo', 'Ano','Preco', 'Cor','Versão', 'Quantidade', 'Ações'
   ]
   const formPlaceholders = new Map()
   formPlaceholders.set('modelo', 'Gol')
@@ -53,10 +52,18 @@ export default function Carros() {
   const showModal = () => setIsOpen(true)
   const showEditModal = async (id: string) => {
     const car = await getCarById(id)
-    
+    console.log(car)
     if(car){
       setTuUpdateId(car.id_carro.toString())
       setData({
+        modelo: car.modelo,
+        ano: car.ano_fab,
+        preco: Number.parseFloat(car.preco.toFixed(2)),
+        cor: car.nome_cor,
+        versao: car.nome_versao,
+        quantidade: car.quantidade,
+      })
+      reset({
         modelo: car.modelo,
         ano: car.ano_fab,
         preco: Number.parseFloat(car.preco.toFixed(2)),
@@ -140,7 +147,7 @@ export default function Carros() {
                         <td className="whitespace-nowrap px-6 py-4">{car.quantidade}</td>
 
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
-                          <FaPencilAlt onClick={async () => showEditModal(car.id_carro)} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
+                          <FaPencilAlt onClick={async () => showEditModal(car.id_carro.toString())} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
                           <FaTrashAlt className="hover:cursor-pointer" style={{ color: 'red' }}/>
                         </td>
                       </tr>

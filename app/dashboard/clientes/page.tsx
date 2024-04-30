@@ -1,5 +1,4 @@
 'use client'
-import { FuncInfo } from "@/app/api/getFuncionarios/route"
 import Modal from "@/app/components/Modal"
 import { useEffect, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
@@ -70,6 +69,10 @@ export default function Clientes() {
         nascimeto: new Date(cliente.nascimento_pessoa),
         tel: cliente.phone_pessoa,
       })
+      reset({
+        nome: cliente.nome_pessoa,
+        tel: cliente.phone_pessoa,
+      })
     }
     setIsEditOpen(true)
   }
@@ -100,7 +103,7 @@ export default function Clientes() {
       });
   }, [])
 
-  if(loading) return (<h1>Carregando...</h1>)
+  if(loading) return (<h1>Carregando Clientes...</h1>)
   if(error) return (<h1>Error: {error}</h1>)
 
   return (

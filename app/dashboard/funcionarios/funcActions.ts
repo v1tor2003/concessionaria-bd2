@@ -56,6 +56,7 @@ export async function editFunc(id: string, data: Inputs){
 
 export async function getFuncById(id: string): Promise<FuncDetails | undefined> {
   try {
+    // call pegar_func_id
     const [rows] = await database.execute<FuncDetails[]>(`
       SELECT 
         funcionario.id_func, 

@@ -36,8 +36,23 @@ export interface Cor extends RowDataPacket {
   preco_cor: number
 }
 
-export interface Cliente extends RowDataPacket {
+export interface Cliente extends Details {
   id_cliente: number
 }
 
-export interface Cliente extends Details {}
+export interface Venda extends RowDataPacket {
+  id_venda: number
+  data_venda: string
+  nome_cliente: string
+  usuario_func: string
+  modelo: string
+  nome_cor: string
+  nome_versao: string
+}
+
+
+export interface VendaInfo extends Venda {
+  id_funcionario_fk: number
+  id_carro_fk: number
+  id_cliente_fk:number
+}

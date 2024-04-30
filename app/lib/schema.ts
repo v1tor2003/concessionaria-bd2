@@ -29,3 +29,10 @@ export const FormAddClienteSchema = z.object({
   nascimeto: z.coerce.date({message: 'Data é requerida'}),
   tel: z.string().regex(brazilianPhoneRegex, 'Telefone inválido'),
 })
+
+export const FormAddVendaSchema = z.object({
+  data: z.coerce.date({message: 'Data da venda é requerida'}),
+  funcionario: z.string().min(1, {message: 'Funcionário é requerido'}),
+  modelo: z.coerce.number().min(1, {message: 'Carro é requerido'}),
+  cliente: z.coerce.number().min(1, {message: 'Cliente é requerido'})
+})
