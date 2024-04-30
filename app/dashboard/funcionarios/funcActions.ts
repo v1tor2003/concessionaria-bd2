@@ -35,12 +35,23 @@ export async function addFunc(data: Inputs) {
 }
 
 export async function editFunc(id: string, data: Inputs){
-  console.log(id, data)
-  try {
+  let params = []
+  const result = FormAddFuncSchema.safeParse(data)
+  
+  if(result.error) return { success: false, error: result.error.format() }
+  params.push(id)
+  Array.prototype.push.apply(params, Object.values(result.data))
 
-  } catch (error: unknown) {
+  try{
+    await database.execute<Func[]>(`
+      CALL alterar_funcionario (?, ?, ?, ?, ?, ?, ?, ?)
+    `, params)
+  }catch(error: unknown){
     console.log(error)
   }
+  
+  revalidatePath('/dashboard/funcionarios')
+  return { success: true, data: result.data }
 }
 
 export async function getFuncById(id: string): Promise<FuncDetails | undefined> {
@@ -67,4 +78,13 @@ export async function getFuncById(id: string): Promise<FuncDetails | undefined> 
     console.log(error)
   }
   return undefined
+}
+
+
+export async function deleteFunc(id: string) {
+  try {
+    await database.execute(`DELETE FROM funcionario WHERE id_func = ?`, [id])
+  } catch (error) {
+    console.log(error)
+  }
 }

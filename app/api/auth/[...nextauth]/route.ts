@@ -28,7 +28,7 @@ const handler = NextAuth({
         , [username, password])
 
         if(rows.length === 0) return null
-        
+        console.log(rows)
         const id_func = rows[0].id_func
         let [func] = await 
         database.execute<FuncDetails[]>(`

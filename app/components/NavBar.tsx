@@ -18,15 +18,15 @@ export default function Navbar () {
     const options: NavOption[] = [
       {
         label: 'Carros',
-        url: '/carros'
+        url: '/dashboard/carros'
       },
       {
         label: 'Clientes',
-        url: '/clientes'
+        url: '/dashboard/clientes'
       },
       {
-        label: 'Outra',
-        url: '/outra'
+        label: 'Vendas',
+        url: '/dashboard/vendas'
       }
     ]
 

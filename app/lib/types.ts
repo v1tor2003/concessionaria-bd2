@@ -17,3 +17,27 @@ export interface Details {
 
 export interface FuncDetails extends Func {}
 export interface FuncDetails extends Details {}
+
+export interface Carro extends RowDataPacket {
+  id_carro: number
+  id_cor: number
+  id_versao: number
+  modelo: string
+  ano_fab: number
+  quantidade: number
+  nome_versao: string
+  nome_cor: string
+  preco: number
+}
+
+export interface Cor extends RowDataPacket {
+  id_cor: number
+  nome_cor: string
+  preco_cor: number
+}
+
+export interface Cliente extends RowDataPacket {
+  id_cliente: number
+}
+
+export interface Cliente extends Details {}

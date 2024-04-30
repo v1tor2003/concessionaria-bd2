@@ -5,27 +5,33 @@ import { useEffect, useState } from "react"
 import { SubmitHandler, useForm } from "react-hook-form"
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FaPencilAlt, FaTrashAlt } from "react-icons/fa"
-import { addFunc, deleteFunc, editFunc, getFuncById } from "./funcActions"
+import { addCustomer, deleteCustomer, editCustomer, getCustomerById } from "./customerActions"
 import { z } from "zod"
-import { FormAddFuncSchema } from "@/app/lib/schema"
+import { FormAddClienteSchema } from "@/app/lib/schema"
 import RenderFormFields from "@/app/components/RenderFormFields"
+import { Cliente } from "@/app/lib/types"
 
-export type Inputs = z.infer<typeof FormAddFuncSchema>
+export type Inputs = z.infer<typeof FormAddClienteSchema>
 
-export default function Funcionarios() {
+function formatDateAsBrazilian(date: Date): String | undefined {
+  if(date === undefined) return 
+  const day = date.getDate().toString().padStart(2, '0');
+  const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month is 0-indexed
+  const year = date.getFullYear();
+  return `${day}-${month}-${year}`;
+}
+
+export default function Clientes() {
   const tableLabels = [
-    'Id', 'Nome', 'Cargo', 'Salario','Ações'
+    'Id', 'Nome', 'Nascimento', 'Telefone','Ações'
   ]
-  const AddFormPlaceholders = new Map()
-  AddFormPlaceholders.set('nome', 'Joao')
-  AddFormPlaceholders.set('usuario', 'joao123')
-  AddFormPlaceholders.set('senha', '****')
-  AddFormPlaceholders.set('salario', '1000.00')
-  AddFormPlaceholders.set('tel', '(xx) xxxx-xxxx')
+  const formPlaceholders = new Map()
+  formPlaceholders.set('nome', 'Joao')
+  formPlaceholders.set('tel', '(xx) xxxx-xxxx')
 
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | undefined>(undefined)
-  const [funcionarios, setFuncionarios] = useState<FuncInfo[]>([])
+  const [clientes, setClientes] = useState<Cliente[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
@@ -33,40 +39,36 @@ export default function Funcionarios() {
   const [selectedId, setSelectedId] = useState<string>('')
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
-    resolver: zodResolver(FormAddFuncSchema)
+    resolver: zodResolver(FormAddClienteSchema)
   })
   
   const processAdd: SubmitHandler<Inputs> = async (data) => {
-    await addFunc(data)
+    await addCustomer(data)
     reset()
     closeModal()
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
-    await editFunc(selectedId, data)
+    await editCustomer(selectedId, data)
     reset()
     closeEditModal()
   }
 
   const processDelete = async () => {
-    await deleteFunc(selectedId)
+    await deleteCustomer(selectedId)
     closeEditModal()
   }
 
   const showModal = () => setIsOpen(true)
   const showEditModal = async (id: string) => {
-    const func = await getFuncById(id)
+    const cliente = await getCustomerById(id)
     
-    if(func){
-      setSelectedId(func.id_func)
+    if(cliente){
+      setSelectedId(cliente.id_cliente.toString())
       setData({
-        nome: func.nome_pessoa,
-        nascimeto: new Date(func.nascimento_pessoa),
-        tel: func.phone_pessoa,
-        usuario: func.usuario_func,
-        senha: func.senha_func,
-        salario:  func.salario_func,
-        cargo: func.cargo_func
+        nome: cliente.nome_pessoa,
+        nascimeto: new Date(cliente.nascimento_pessoa),
+        tel: cliente.phone_pessoa,
       })
     }
     setIsEditOpen(true)
@@ -80,16 +82,16 @@ export default function Funcionarios() {
   const closeEditModal = () => setIsEditOpen(false)
   
   useEffect(() => {
-    fetch('/api/getFuncionarios')
+    fetch('/api/getClientes')
       .then(response => {
         if (!response.ok) {
-          throw new Error('Erro ao pegar funcionarios');
+          throw new Error('Erro ao pegar clientes');
         }
         return response.json();
       })
-      .then(({ rows }) => {
-        console.log(rows)
-        setFuncionarios(rows);
+      .then(({ clientes }) => {
+        console.log(clientes)
+        setClientes(clientes);
         setLoading(false);
       })
       .catch(error => {
@@ -103,19 +105,19 @@ export default function Funcionarios() {
 
   return (
     <>
-      <Modal isOpen={isOpen} closeModal={closeModal} label="Criar Funcionário">
+      <Modal isOpen={isOpen} closeModal={closeModal} label="Criar Cliente">
         <form 
         onSubmit={handleSubmit(processAdd)}
         className="grid grid-cols-2 gap-2">
-          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
+          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddClienteSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Criar</button>
         </form>
       </Modal>
-      <Modal isOpen={isEditOpen} closeModal={closeEditModal} label="Editar Funcionário">
+      <Modal isOpen={isEditOpen} closeModal={closeEditModal} label="Editar Cliente">
         <form 
         onSubmit={handleSubmit(processEdit)}
         className="grid grid-cols-2 gap-2">
-          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
+          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddClienteSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>
@@ -127,7 +129,7 @@ export default function Funcionarios() {
       </Modal>
       <div className={`${isOpen || isEditOpen ? 'blur-sm': ''} flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6`}>
         <div className="flex w-full text-left justify-between">
-          <h1 className="text-2xl font-bold">Funcionários:</h1>
+          <h1 className="text-2xl font-bold">Clientes:</h1>
           <button onClick={showModal} className="mr-4 bg-[#3a0039] hover:opacity-75 text-white font-bold py-2 px-4 rounded">
             Criar
           </button>
@@ -143,15 +145,15 @@ export default function Funcionarios() {
                   </tr>
                 </thead>
                 <tbody>
-                  {funcionarios && funcionarios.map((func) => 
-                      <tr key={func.id_func} className="border-b dark:border-neutral-500">
-                        <td className="whitespace-nowrap px-6 py-4 font-medium">{func.id_func}</td>
-                        <td className="whitespace-nowrap px-6 py-4">{func.nome_pessoa}</td>
-                        <td className="whitespace-nowrap px-6 py-4">{func.cargo_func}</td>
-                        <td className="whitespace-nowrap px-6 py-4">{func.salario_func}</td>
+                  {clientes && clientes.map((cliente) => 
+                      <tr key={cliente.id_cliente} className="border-b dark:border-neutral-500">
+                        <td className="whitespace-nowrap px-6 py-4 font-medium">{cliente.id_cliente}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{cliente.nome_pessoa}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{formatDateAsBrazilian(new Date(cliente.nascimento_pessoa))}</td>
+                        <td className="whitespace-nowrap px-6 py-4">{cliente.phone_pessoa}</td>
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
-                          <FaPencilAlt onClick={async () => showEditModal(func.id_func)} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
-                          <FaTrashAlt onClick={() => showDeleteModal(func.id_func)} className="hover:cursor-pointer" style={{ color: 'red' }}/>
+                          <FaPencilAlt onClick={async () => showEditModal(cliente.id_cliente.toString())} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
+                          <FaTrashAlt onClick={() => showDeleteModal(cliente.id_cliente.toString())} className="hover:cursor-pointer" style={{ color: 'red' }}/>
                         </td>
                       </tr>
                     )}
