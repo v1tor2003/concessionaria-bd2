@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const [clientes] = await 
     database.execute<Cliente[]>(`
-      SELECT * FROM clientes
+      SELECT * FROM mostrar_clientes
     `)
 
     return Response.json({clientes})  

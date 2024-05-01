@@ -30,8 +30,9 @@ export default function Carros() {
   const [cores, setCores] = useState<Cor[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
+  const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const [data, setData] = useState<Inputs>()
-  const [toUpdateId, setTuUpdateId] = useState<string>('')
+  const [selectedId, setSelectedId] = useState<string>('')
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddCarSchema)
@@ -44,17 +45,42 @@ export default function Carros() {
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
-    await editCar(toUpdateId, data)
+    await editCar(selectedId, data)
     reset()
     closeEditModal()
   }
 
-  const showModal = () => setIsOpen(true)
+  const processDelete = async () => {
+    await deleteCar(selectedId)
+    closeDeleteModal()
+  }
+
+  const showModal = () => {
+    setData({
+      modelo: '',
+      ano: 0,
+      preco: 0,
+      cor: '',
+      versao: '',
+      quantidade: 0
+    })
+    reset(
+      {
+        modelo: '',
+        ano: 0,
+        preco: 0,
+        cor: cores[0].nome_cor,
+        versao: 'gold',
+        quantidade: 0,
+      }
+    )
+    setIsOpen(true)
+  }
   const showEditModal = async (id: string) => {
     const car = await getCarById(id)
     console.log(car)
     if(car){
-      setTuUpdateId(car.id_carro.toString())
+      setSelectedId(car.id_carro.toString())
       setData({
         modelo: car.modelo,
         ano: car.ano_fab,
@@ -74,8 +100,14 @@ export default function Carros() {
     }
     setIsEditOpen(true)
   }
+  const showDeleteModal = (id: string) => {
+    setSelectedId(id)
+    setIsDeleteOpen(true)
+  }
+
   const closeModal = () => setIsOpen(false)
   const closeEditModal = () => setIsEditOpen(false)
+  const closeDeleteModal = () => setIsDeleteOpen(false)
 
   useEffect(() => {
     fetch('/api/getCarros')
@@ -118,6 +150,12 @@ export default function Carros() {
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>
+      <Modal isOpen={isDeleteOpen} closeModal={closeDeleteModal} label="Deletar Carro">
+        <div className="flex justify-end">
+          <p className="text-sm mb-4">Deseja apagar este carro?</p>
+          <button onClick={() => processDelete()} className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white " >Deletar</button>
+        </div>
+      </Modal>
       <div className={`${isOpen || isEditOpen ? 'blur-sm': ''} flex flex-col items-center justify-center shadow-xl p-10 mt-10 w-5/6`}>
         <div className="flex w-full text-left justify-between">
           <h1 className="text-2xl font-bold">Carros:</h1>
@@ -148,7 +186,7 @@ export default function Carros() {
 
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
                           <FaPencilAlt onClick={async () => showEditModal(car.id_carro.toString())} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
-                          <FaTrashAlt className="hover:cursor-pointer" style={{ color: 'red' }}/>
+                          {car.deletavel ? (<FaTrashAlt onClick={() => showDeleteModal(car.id_carro.toString())} className="hover:cursor-pointer" style={{ color: 'red' }}/>) : (<></>)}
                         </td>
                       </tr>
                     )}

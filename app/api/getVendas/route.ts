@@ -21,7 +21,7 @@ export async function GET() {
       JOIN
         detalhespessoa ON funcionario.id_detalhepessoa_fk = detalhespessoa.id_detalhepessoa`
     )
-    console.log(funcs)
+    
     return Response.json({vendas, funcs})  
   } catch (error) {
     console.log(error)

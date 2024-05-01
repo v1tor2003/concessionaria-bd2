@@ -43,17 +43,37 @@ export default function Funcionarios() {
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
-    await editFunc(selectedId, data)
     reset()
+    await editFunc(selectedId, data)
     closeEditModal()
   }
 
   const processDelete = async () => {
     await deleteFunc(selectedId)
-    closeEditModal()
+    closeDeleteModal()
   }
 
-  const showModal = () => {setIsOpen(true)}
+  const showModal = () => {
+    setData({
+      nome: '',
+      nascimeto: new Date(Date.now()),
+      tel: '',
+      usuario: '',
+      senha: '',
+      salario:  0,
+      cargo: 'funcionario'
+    })
+    reset({
+      nome: '',
+      tel: '',
+      nascimeto:  new Date(Date.now()),
+      usuario: '',
+      senha: '',
+      salario: undefined,
+      cargo: 'funcionario'
+    })
+    setIsOpen(true)
+  }
   const showEditModal = async (id: string) => {
     const func = await getFuncById(id)
     
@@ -71,6 +91,7 @@ export default function Funcionarios() {
       reset({
         nome: func.nome_pessoa,
         tel: func.phone_pessoa,
+        nascimeto: new Date(func.nascimento_pessoa),
         usuario: func.usuario_func,
         senha: func.senha_func,
         salario:  func.salario_func,
@@ -121,7 +142,7 @@ export default function Funcionarios() {
       </Modal>
       <Modal isOpen={isEditOpen} closeModal={closeEditModal} label="Editar Funcionário">
         <form 
-        onSubmit={handleSubmit(processEdit)}
+        onSubmit={(handleSubmit(processEdit))}
         className="grid grid-cols-2 gap-2">
           <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
@@ -159,7 +180,7 @@ export default function Funcionarios() {
                         <td className="whitespace-nowrap px-6 py-4">{func.salario_func}</td>
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
                           <FaPencilAlt onClick={async () => showEditModal(func.id_func)} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
-                          <FaTrashAlt onClick={() => showDeleteModal(func.id_func)} className="hover:cursor-pointer" style={{ color: 'red' }}/>
+                          {func.deletavel ? (<FaTrashAlt onClick={() => showDeleteModal(func.id_func)} className="hover:cursor-pointer" style={{ color: 'red' }}/>) : (<></>)}
                         </td>
                       </tr>
                     )}

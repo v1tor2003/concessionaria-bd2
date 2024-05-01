@@ -55,10 +55,22 @@ export default function Clientes() {
 
   const processDelete = async () => {
     await deleteCustomer(selectedId)
-    closeEditModal()
+    closeDeleteModal()
   }
 
-  const showModal = () => setIsOpen(true)
+  const showModal = () => {
+    setData({
+      nome: '',
+      tel: '',
+      nascimeto: new Date(Date.now())
+    })
+    reset({
+      nome: '',
+      tel: '',
+      nascimeto: undefined
+    })
+    setIsOpen(true)
+  }
   const showEditModal = async (id: string) => {
     const cliente = await getCustomerById(id)
     
@@ -80,9 +92,9 @@ export default function Clientes() {
     setSelectedId(id)
     setIsDeleteOpen(true)
   }
-  const closeDeleteModal = () => setIsDeleteOpen(false)
   const closeModal = () => setIsOpen(false)
   const closeEditModal = () => setIsEditOpen(false)
+  const closeDeleteModal = () => setIsDeleteOpen(false)
   
   useEffect(() => {
     fetch('/api/getClientes')
@@ -124,9 +136,9 @@ export default function Clientes() {
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>
-      <Modal isOpen={isDeleteOpen} closeModal={closeDeleteModal} label="Deletar Funcionário">
+      <Modal isOpen={isDeleteOpen} closeModal={closeDeleteModal} label="Deletar Cliente">
         <div className="flex justify-end">
-          <p className="text-sm mb-4">Deseja apagar este funcionário?</p>
+          <p className="text-sm mb-4">Deseja apagar este cliente?</p>
           <button onClick={() => processDelete()} className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white " >Deletar</button>
         </div>
       </Modal>
@@ -156,7 +168,7 @@ export default function Clientes() {
                         <td className="whitespace-nowrap px-6 py-4">{cliente.phone_pessoa}</td>
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
                           <FaPencilAlt onClick={async () => showEditModal(cliente.id_cliente.toString())} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
-                          <FaTrashAlt onClick={() => showDeleteModal(cliente.id_cliente.toString())} className="hover:cursor-pointer" style={{ color: 'red' }}/>
+                          {cliente.deletavel ? (<FaTrashAlt onClick={() => showDeleteModal(cliente.id_cliente.toString())} className="hover:cursor-pointer" style={{ color: 'red' }}/>) : (<></>)}
                         </td>
                       </tr>
                     )}

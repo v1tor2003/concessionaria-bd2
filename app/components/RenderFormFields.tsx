@@ -1,11 +1,9 @@
 'use client'
 import { FieldError, UseFormRegister } from "react-hook-form"
 import { z } from "zod"
-import { Cliente, Cor, Func } from "../lib/types"
+import { Cor, Func } from "../lib/types"
 import { useSession } from "next-auth/react"
 import SearchInput from "./SearchInputCliente"
-import { useState } from "react"
-import { getCustomerByName } from "../dashboard/clientes/customerActions"
 
 interface Props {
   funcs?: Func[]
@@ -28,7 +26,7 @@ function formatDate(date: Date): String | undefined {
 
 export default function RenderFormFields<T extends z.ZodRawShape>({ funcs,colors, values, placeholders, register, errors, schema }: Props) {
   const {data:session} = useSession()
-
+  
   return Object.entries(schema.shape).map(([fieldName, field]) => {
     const type = field._def.typeName.replace('Zod', '').toLowerCase();
 
@@ -36,7 +34,7 @@ export default function RenderFormFields<T extends z.ZodRawShape>({ funcs,colors
       return (
         <div className="flex flex-col" key={fieldName}>
           <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
-          <SearchInput />
+          <SearchInput register={register}/>
           {errors[fieldName] && (
             <p className="text-sm text-red-400">{errors[fieldName].message}</p>
           )}

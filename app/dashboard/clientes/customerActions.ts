@@ -49,7 +49,7 @@ export async function editCustomer(id: string, data: Inputs){
 export async function getCustomerById(id: string): Promise<Cliente | undefined> {
   try {
     const [rows] = await database.execute<Cliente[]>(`
-      SELECT * FROM clientes 
+      SELECT * FROM mostrar_clientes 
       WHERE id_cliente = ?
     `, [id])
     return rows[0]
@@ -62,7 +62,7 @@ export async function getCustomerById(id: string): Promise<Cliente | undefined> 
 export async function getCustomerByName(name: string): Promise<Cliente[] | undefined> {
   try {
     const [rows] = await database.execute<Cliente[]>(`
-      SELECT * FROM clientes 
+      SELECT * FROM mostrar_clientes 
       WHERE nome_pessoa LIKE ?
     `, [`%${name}%`])
     return rows.length !== 0 ? rows : undefined

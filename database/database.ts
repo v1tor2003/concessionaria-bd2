@@ -17,7 +17,7 @@ async function connect(credentials: mysql.ConnectionOptions): Promise<mysql.Conn
   })
 }
 
-async function main(): Promise<void>{
+const main = async function(): Promise<void>{
   if(process.env.NODE_ENV === "production"){
       database = await connect(dbCredentials)
   }

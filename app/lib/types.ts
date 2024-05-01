@@ -1,5 +1,9 @@
 import { RowDataPacket } from "mysql2"
 
+interface Deletavel {
+  deletavel: boolean
+}
+
 export interface FuncInfo extends RowDataPacket {
   id_func: string
   cargo_func: string
@@ -63,3 +67,8 @@ export interface VendaInfo extends Venda {
   id_carro_fk: number
   id_cliente_fk:number
 }
+
+
+export interface Carro extends Deletavel {}
+export interface Cliente extends Deletavel {}
+export interface FuncInfo extends Deletavel {}

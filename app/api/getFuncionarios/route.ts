@@ -4,15 +4,8 @@ import database from "@/database/database"
 export async function GET() {
   const [rows] = await 
   database.execute<FuncInfo[]>(`
-    SELECT 
-      funcionario.id_func, 
-      funcionario.cargo_func,
-      funcionario.salario_func,
-      detalhespessoa.nome_pessoa
-    FROM
-      funcionario
-    JOIN
-      detalhespessoa ON funcionario.id_detalhepessoa_fk = detalhespessoa.id_detalhepessoa`)
+    SELECT * FROM mostrar_func
+  `)
 
   return Response.json({rows})
 }

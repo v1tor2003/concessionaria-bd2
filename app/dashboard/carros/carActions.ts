@@ -49,7 +49,7 @@ export async function editCar(id: string, data: Inputs){
 export async function getCarById(id: string): Promise<Carro | undefined> {
   try {
     const [rows] = await database.execute<Carro[]>(`
-      SELECT * FROM mostrar_carro_info
+      SELECT * FROM mostrar_carros
       WHERE id_carro = ?
     `, [id])
 
@@ -62,7 +62,7 @@ export async function getCarById(id: string): Promise<Carro | undefined> {
 
 export async function deleteCar(id: string) {
   try {
-    console.log('todo deletar carro')
+    await database.execute(`DELETE FROM carro WHERE id_carro = ?`, [id])
   } catch (error) {
     console.log(error)
   }

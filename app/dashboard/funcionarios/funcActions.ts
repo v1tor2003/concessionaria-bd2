@@ -58,21 +58,9 @@ export async function getFuncById(id: string): Promise<FuncDetails | undefined> 
   try {
     // call pegar_func_id
     const [rows] = await database.execute<FuncDetails[]>(`
-      SELECT 
-        funcionario.id_func, 
-        funcionario.cargo_func,
-        funcionario.usuario_func,
-        funcionario.senha_func,
-        funcionario.salario_func,
-        detalhespessoa.nome_pessoa,
-        detalhespessoa.nascimento_pessoa,
-        detalhespessoa.phone_pessoa
-      FROM
-        funcionario
-      JOIN
-        detalhespessoa ON funcionario.id_detalhepessoa_fk = detalhespessoa.id_detalhepessoa
-      WHERE
-        funcionario.id_func = ?
+      SELECT *
+      FROM mostrar_func
+      WHERE id_func = ?
     `, [id])
     return rows[0]
   } catch (error) {

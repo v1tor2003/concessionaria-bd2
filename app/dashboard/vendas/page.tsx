@@ -69,7 +69,7 @@ export default function Vendas() {
   }
   const showEditModal = async (id: string) => {
     const sell = await getSellById(id)
-    
+    console.log('aq', sell)
     if(sell){
       setSelectedId(sell.id_venda.toString())
       //setData()
@@ -90,7 +90,6 @@ export default function Vendas() {
         return response.json();
       })
       .then(({ vendas, funcs  }) => {
-        console.log(vendas, funcs)
         setVendas(vendas);
         setFuncs(funcs);
         setLoading(false);
@@ -108,7 +107,7 @@ export default function Vendas() {
     <>
       <Modal isOpen={isOpen} closeModal={closeModal} label="Criar Venda">
         <form 
-        onSubmit={handleSubmit(processAdd)}
+        onSubmit={() => console.log(data)}
         className="grid grid-cols-2 gap-2">
           <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddVendaSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Criar</button>
