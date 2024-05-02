@@ -32,7 +32,7 @@ export default function Funcionarios() {
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const { register, handleSubmit, reset, setValue,formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddFuncSchema)
   })
   
@@ -88,15 +88,6 @@ export default function Funcionarios() {
         salario:  func.salario_func,
         cargo: func.cargo_func
       })
-      reset({
-        nome: func.nome_pessoa,
-        tel: func.phone_pessoa,
-        nascimeto: new Date(func.nascimento_pessoa),
-        usuario: func.usuario_func,
-        senha: func.senha_func,
-        salario:  func.salario_func,
-        cargo: func.cargo_func
-      })
     }
     setIsEditOpen(true)
   }
@@ -144,7 +135,7 @@ export default function Funcionarios() {
         <form 
         onSubmit={(handleSubmit(processEdit))}
         className="grid grid-cols-2 gap-2">
-          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
+          <RenderFormFields isEdit={true} setValue={setValue} values={data || {}} register={register} errors={errors} placeholders={AddFormPlaceholders} schema={FormAddFuncSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>

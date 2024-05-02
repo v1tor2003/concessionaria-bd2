@@ -33,6 +33,6 @@ export const FormAddClienteSchema = z.object({
 export const FormAddVendaSchema = z.object({
   data: z.coerce.date({message: 'Data da venda é requerida'}),
   funcionario: z.string().min(1, {message: 'Funcionário é requerido'}),
-  modelo: z.coerce.number().min(1, {message: 'Carro é requerido'}),
-  cliente: z.coerce.number().min(1, {message: 'Cliente é requerido'})
+  carro: z.string().min(1, {message: 'Carro é requerido'}),
+  cliente: z.string().min(1, {message: 'Cliente é requerido'})
 })

@@ -8,7 +8,7 @@ import { addSell, editSell, getSellById } from "./sellActions"
 import { z } from "zod"
 import { FormAddVendaSchema } from "@/app/lib/schema"
 import RenderFormFields from "@/app/components/RenderFormFields"
-import { Func, Venda } from "@/app/lib/types"
+import { Func, FuncDetails, Venda, VendaInfo } from "@/app/lib/types"
 import { useSession } from "next-auth/react"
 
 export type Inputs = z.infer<typeof FormAddVendaSchema>
@@ -34,14 +34,15 @@ export default function Vendas() {
 
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | undefined>(undefined)
-  const [vendas, setVendas] = useState<Venda[]>([])
-  const [funcs, setFuncs] = useState<Func[]>([])
+  const [vendas, setVendas] = useState<VendaInfo[]>([])
+  const [funcs, setFuncs] = useState<FuncDetails[]>([])
   const [isOpen, setIsOpen] = useState<boolean>(false)
   const [isEditOpen, setIsEditOpen] = useState<boolean>(false)
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
+  const [sell, setSell] = useState<VendaInfo>()
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddVendaSchema)
   })
   
@@ -67,20 +68,26 @@ export default function Vendas() {
     }
     setIsOpen(true)
   }
-  const showEditModal = async (id: string) => {
+  const showEditModal = async (id: number) => {
     const sell = await getSellById(id)
-    console.log('aq', sell)
+    setSell(sell)
     if(sell){
       setSelectedId(sell.id_venda.toString())
-      //setData()
-      reset({})
+      const funcName = funcs.find(f => f.id_func == sell.id_funcionario_fk.toString())
+      
+      setData({
+        data: new Date(sell.data_venda),
+        funcionario: funcName ? `${funcName.nome_pessoa} (${funcName.usuario_func})`: '',
+        carro: sell.id_carro_fk.toString(),
+        cliente: sell.id_cliente_fk.toString(),
+      })
     }
     setIsEditOpen(true)
   }
   
   const closeModal = () => setIsOpen(false)
   const closeEditModal = () => setIsEditOpen(false)
-  
+ 
   useEffect(() => {
     fetch('/api/getVendas')
       .then(response => {
@@ -90,6 +97,7 @@ export default function Vendas() {
         return response.json();
       })
       .then(({ vendas, funcs  }) => {
+        console.log(vendas, funcs)
         setVendas(vendas);
         setFuncs(funcs);
         setLoading(false);
@@ -100,6 +108,8 @@ export default function Vendas() {
       });
   }, [])
 
+  console.log(data)
+
   if(loading) return (<h1>Carregando Vendas...</h1>)
   if(error) return (<h1>Error: {error}</h1>)
 
@@ -107,9 +117,9 @@ export default function Vendas() {
     <>
       <Modal isOpen={isOpen} closeModal={closeModal} label="Criar Venda">
         <form 
-        onSubmit={() => console.log(data)}
+        onSubmit={handleSubmit(processAdd)}
         className="grid grid-cols-2 gap-2">
-          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddVendaSchema}/>    
+          <RenderFormFields carId='' clienteId='' setValue={setValue} values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddVendaSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Criar</button>
         </form>
       </Modal>
@@ -117,7 +127,17 @@ export default function Vendas() {
         <form 
         onSubmit={handleSubmit(processEdit)}
         className="grid grid-cols-2 gap-2">
-          <RenderFormFields funcs={funcs} values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddVendaSchema}/>    
+          <RenderFormFields 
+            setValue={setValue} 
+            carId={sell?.id_carro_fk ? sell?.id_carro_fk.toString() : ''} 
+            clienteId={sell?.id_cliente_fk ? sell?.id_cliente_fk.toString() : ''} 
+            funcId={sell?.id_funcionario_fk ? sell?.id_funcionario_fk.toString() : ''}
+            funcs={funcs} 
+            isEdit={true} 
+            values={data || {}} 
+            register={register} 
+            errors={errors} placeholders={formPlaceholders} 
+            schema={FormAddVendaSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>
@@ -149,7 +169,7 @@ export default function Vendas() {
                         <td className="whitespace-nowrap px-6 py-4">{venda.nome_cor}</td>
                         <td className="whitespace-nowrap px-6 py-4">{venda.nome_versao}</td>
                         <td className="flex gap-2 items-center justify-center whitespace-nowrap px-6 py-4">
-                          <FaPencilAlt onClick={async () => showEditModal(venda.id_venda.toString())} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
+                          <FaPencilAlt onClick={() => showEditModal(venda.id_venda)} className="hover:cursor-pointer" style={{ color: 'blue' }}/>
                         </td>
                       </tr>
                     )}

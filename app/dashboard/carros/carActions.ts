@@ -59,6 +59,20 @@ export async function getCarById(id: string): Promise<Carro | undefined> {
   }
 }
 
+export async function getCarByInfo(value: string) {
+  try {
+    const params = value.split(' ')
+    let sql = 'SELECT * FROM mostrar_carros WHERE '
+    params[0] ? sql += `ano_fab LIKE '${params[0]}%' ` : ''
+    params[1] ? sql += `AND modelo = '${params[1]}' ` : ''
+    params[2] ? sql += `AND nome_cor = '${params[2]}'` : ''
+
+    const [rows] = await database.execute<Carro[]>(sql, [])
+    return rows
+  } catch (error) {
+    console.log(error)
+  }
+}
 
 export async function deleteCar(id: string) {
   try {

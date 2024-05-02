@@ -72,3 +72,15 @@ export interface VendaInfo extends Venda {
 export interface Carro extends Deletavel {}
 export interface Cliente extends Deletavel {}
 export interface FuncInfo extends Deletavel {}
+export interface Test extends RowDataPacket {
+  id_venda: number,
+  data_venda: string,
+  nome_cliente: string,
+  usuario_func: string,
+  modelo: string,
+  nome_cor: string,
+  nome_versao: string,
+  id_funcionario_fk: number,
+  id_carro_fk: number,
+  id_cliente_fk: number
+}

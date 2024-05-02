@@ -8,12 +8,21 @@ import { z } from 'zod'
 
 type Inputs = z.infer<typeof FormAddClienteSchema>
 
+function fomartToSQL(data: Date): string {
+  const year = data.getFullYear()
+  const month = (data.getMonth() + 1).toString().padStart(2, '0')
+  const day = data.getDate().toString().padStart(2, '0')
+  return `${year}-${month}-${Number.parseInt(day)+1}`
+}
+
 export async function addCustomer(data: Inputs) {
   const result = FormAddClienteSchema.safeParse(data)
   
   if(result.error) return { success: false, error: result.error.format() }
 
-  const params = Object.values(result.data)
+  let params = Object.values(result.data)
+  params[1] = fomartToSQL(new Date(params[1]))
+  
   try{
     await database.execute(`
       CALL adicionar_cliente (?, ?, ?)
@@ -33,7 +42,8 @@ export async function editCustomer(id: string, data: Inputs){
   if(result.error) return { success: false, error: result.error.format() }
   params.push(id)
   Array.prototype.push.apply(params, Object.values(result.data))
-
+  params[2] = fomartToSQL(new Date(params[2]))
+  
   try{
     await database.execute<Cliente[]>(`
       CALL alterar_cliente (?, ?, ?, ?)

@@ -1,18 +1,25 @@
 'use client'
-import { FieldError, UseFormRegister } from "react-hook-form"
+import { FieldError, UseFormRegister, UseFormSetValue } from "react-hook-form"
 import { z } from "zod"
-import { Cor, Func } from "../lib/types"
+import { Cor, FuncDetails } from "../lib/types"
 import { useSession } from "next-auth/react"
-import SearchInput from "./SearchInputCliente"
+import SearchInputCarro from "./SearchInputCarro"
+import SearchInputCliente from "./SearchInputCliente"
+import { useEffect } from "react"
 
 interface Props {
-  funcs?: Func[]
+  funcs?: FuncDetails[]
   colors?: Cor[]
   values: any
+  isEdit: boolean
   placeholders: Map<string, string>
   schema: z.ZodObject<T>
   register: UseFormRegister<any>
+  setValue: UseFormSetValue<any>
   errors: FieldError
+  clienteId: string
+  carId: string
+  funcId: string
 }
 
 function formatDate(date: Date): String | undefined {
@@ -23,9 +30,20 @@ function formatDate(date: Date): String | undefined {
   return `${year}-${month}-${day}`;
 }
 
-
-export default function RenderFormFields<T extends z.ZodRawShape>({ funcs,colors, values, placeholders, register, errors, schema }: Props) {
+export default function RenderFormFields<T extends z.ZodRawShape>(
+  { funcs,colors, isEdit, clienteId, carId, funcId, values, placeholders, register, setValue,errors, schema }
+: Props) {
   const {data:session} = useSession()
+  const getFunc = () => {
+    const fu = funcs?.find(f => f.id_func == funcId)
+    if(isEdit)
+      return `${fu.nome_pessoa} (${fu?.usuario_func})`
+    else return ''
+  }
+
+  useEffect(() => {
+    if(isEdit && funcId) setValue('funcionario', getFunc())
+  }, [])
   
   return Object.entries(schema.shape).map(([fieldName, field]) => {
     const type = field._def.typeName.replace('Zod', '').toLowerCase();
@@ -34,7 +52,19 @@ export default function RenderFormFields<T extends z.ZodRawShape>({ funcs,colors
       return (
         <div className="flex flex-col" key={fieldName}>
           <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
-          <SearchInput register={register}/>
+          <SearchInputCliente clienteId={clienteId}setValue={setValue} register={register}/>
+          {errors[fieldName] && (
+            <p className="text-sm text-red-400">{errors[fieldName].message}</p>
+          )}
+        </div>
+      )  
+    }
+
+    if (fieldName === 'carro') {
+      return (
+        <div className="flex flex-col" key={fieldName}>
+          <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
+          <SearchInputCarro carId={carId} setValue={setValue} register={register}/>
           {errors[fieldName] && (
             <p className="text-sm text-red-400">{errors[fieldName].message}</p>
           )}
@@ -96,16 +126,33 @@ export default function RenderFormFields<T extends z.ZodRawShape>({ funcs,colors
       ) 
     }
 
+    if(type === 'date'){
+      if(isEdit) setValue(fieldName, formatDate(values[fieldName]))
+      return(
+        <div className="flex flex-col" key={fieldName}>
+          <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
+          <input
+            type={type}
+            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
+            {...register(fieldName)}
+          />
+          {errors[fieldName] && (
+            <p className="text-sm text-red-400">{errors[fieldName].message}</p>
+          )}
+        </div>
+      )
+    }
+
     if (fieldName === 'funcionario') {
-      if(funcs && !session?.user?.name)
+      if(funcs && isEdit)
         return (
           <div className="flex flex-col" key={fieldName}>
             <label className="capitalize" htmlFor={fieldName}>{fieldName}:</label>
-            <select 
-              {...register(fieldName, { value: values[fieldName]})}
-              className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
+            <select
+            {...register(fieldName)}
+            className="border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
             >
-              {funcs && funcs.map((func) => <option key={func.usuario_func} value={func.usuario_func}>{func.nome_pessoa} ({func.usuario_func})</option>)}
+              {funcs && funcs.map((func) => <option key={func.usuario_func} value={`${func.nome_pessoa} (${func.usuario_func})`}>{func.nome_pessoa} ({func.usuario_func})</option>)}
             </select>
             {errors[fieldName] && (
               <p className="text-sm text-red-400">{errors[fieldName].message}</p>

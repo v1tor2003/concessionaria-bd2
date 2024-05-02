@@ -37,7 +37,7 @@ export default function Clientes() {
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
+  const { register, handleSubmit, reset, setValue,formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddClienteSchema)
   })
   
@@ -59,21 +59,15 @@ export default function Clientes() {
   }
 
   const showModal = () => {
-    setData({
-      nome: '',
-      tel: '',
-      nascimeto: new Date(Date.now())
-    })
     reset({
       nome: '',
-      tel: '',
-      nascimeto: undefined
+      tel: ''
     })
     setIsOpen(true)
   }
   const showEditModal = async (id: string) => {
     const cliente = await getCustomerById(id)
-    
+    console.log(cliente)
     if(cliente){
       setSelectedId(cliente.id_cliente.toString())
       setData({
@@ -83,6 +77,7 @@ export default function Clientes() {
       })
       reset({
         nome: cliente.nome_pessoa,
+        nascimeto: new Date(cliente.nascimento_pessoa),
         tel: cliente.phone_pessoa,
       })
     }
@@ -128,11 +123,11 @@ export default function Clientes() {
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Criar</button>
         </form>
       </Modal>
-      <Modal isOpen={isEditOpen} closeModal={closeEditModal} label="Editar Cliente">
+      <Modal isOpen={isEditOpen}  closeModal={closeEditModal} label="Editar Cliente">
         <form 
         onSubmit={handleSubmit(processEdit)}
         className="grid grid-cols-2 gap-2">
-          <RenderFormFields values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddClienteSchema}/>    
+          <RenderFormFields isEdit={true} setValue={setValue} values={data || {}} register={register} errors={errors} placeholders={formPlaceholders} schema={FormAddClienteSchema}/>    
           <button className="bg-[#3a0039] hover:opacity-75 rounded-md mt-6 px-4 py-2 text-white">Editar</button>
         </form>
       </Modal>
