@@ -36,6 +36,7 @@ export default function Clientes() {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
+  const [reqClientes, setReqClientes] = useState<boolean>(true)
 
   const { register, handleSubmit, reset, setValue,formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddClienteSchema)
@@ -45,17 +46,20 @@ export default function Clientes() {
     await addCustomer(data)
     reset()
     closeModal()
+    setReqClientes(true)
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
     await editCustomer(selectedId, data)
     reset()
     closeEditModal()
+    setReqClientes(true)
   }
 
   const processDelete = async () => {
     await deleteCustomer(selectedId)
     closeDeleteModal()
+    setReqClientes(true)
   }
 
   const showModal = () => {
@@ -95,20 +99,23 @@ export default function Clientes() {
     fetch('/api/getClientes')
       .then(response => {
         if (!response.ok) {
-          throw new Error('Erro ao pegar clientes');
+          throw new Error('Erro ao pegar clientes')
         }
-        return response.json();
+        return response.json()
       })
       .then(({ clientes }) => {
         console.log(clientes)
-        setClientes(clientes);
-        setLoading(false);
+        setClientes(clientes)
+        setLoading(false)
       })
       .catch(error => {
-        setError(error.message);
-        setLoading(false);
+        setError(error.message)
+        setLoading(false)
       });
-  }, [])
+
+    setReqClientes(false)
+
+  }, [reqClientes])
 
   if(loading) return (<h1>Carregando Clientes...</h1>)
   if(error) return (<h1>Error: {error}</h1>)

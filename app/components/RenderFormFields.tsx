@@ -117,7 +117,7 @@ export default function RenderFormFields<T extends z.ZodRawShape>(
             {...register(fieldName, { value: values[fieldName]})}
             className="capitalize border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:border-[#3a0039]"
           >
-            {colors && colors.map((color) => <option key={color.nome_cor} value={color.nome_cor}>{color.nome_cor}</option>)}
+            {colors && colors.map((color) => <option key={color.id_cor} value={color.nome_cor}>{color.nome_cor}</option>)}
           </select>
           {errors[fieldName] && (
             <p className="text-sm text-red-400">{errors[fieldName].message}</p>

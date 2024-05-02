@@ -41,6 +41,8 @@ export default function Vendas() {
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
   const [sell, setSell] = useState<VendaInfo>()
+  const [reqVendas, setReqVendas] = useState<boolean>(false)
+
 
   const { register, handleSubmit, reset, setValue, formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddVendaSchema)
@@ -50,12 +52,14 @@ export default function Vendas() {
     await addSell(data)
     reset()
     closeModal()
+    setReqVendas(true)
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
     await editSell(selectedId, data)
     reset()
     closeEditModal()
+    setReqVendas(true)
   }
 
   const showModal = () => {
@@ -92,21 +96,24 @@ export default function Vendas() {
     fetch('/api/getVendas')
       .then(response => {
         if (!response.ok) {
-          throw new Error('Erro ao pegar vendas');
+          throw new Error('Erro ao pegar vendas')
         }
-        return response.json();
+        return response.json()
       })
       .then(({ vendas, funcs  }) => {
         console.log(vendas, funcs)
-        setVendas(vendas);
-        setFuncs(funcs);
-        setLoading(false);
+        setVendas(vendas)
+        setFuncs(funcs)
+        setLoading(false)
       })
       .catch(error => {
-        setError(error.message);
-        setLoading(false);
-      });
-  }, [])
+        setError(error.message)
+        setLoading(false)
+      })
+
+    setReqVendas(false)
+
+  }, [reqVendas])
 
   console.log(data)
 

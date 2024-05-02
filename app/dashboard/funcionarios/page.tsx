@@ -31,7 +31,7 @@ export default function Funcionarios() {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
-
+  const [reqFunc, setReqFunc] = useState<boolean>(true)
   const { register, handleSubmit, reset, setValue,formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddFuncSchema)
   })
@@ -40,17 +40,20 @@ export default function Funcionarios() {
     await addFunc(data)
     reset()
     closeModal()
+    setReqFunc(true)
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
     reset()
     await editFunc(selectedId, data)
     closeEditModal()
+    setReqFunc(true)
   }
 
   const processDelete = async () => {
     await deleteFunc(selectedId)
     closeDeleteModal()
+    setReqFunc(true)
   }
 
   const showModal = () => {
@@ -103,20 +106,22 @@ export default function Funcionarios() {
     fetch('/api/getFuncionarios')
       .then(response => {
         if (!response.ok) {
-          throw new Error('Erro ao pegar funcionarios');
+          throw new Error('Erro ao pegar funcionarios')
         }
-        return response.json();
+        return response.json()
       })
       .then(({ rows }) => {
         console.log(rows)
-        setFuncionarios(rows);
-        setLoading(false);
+        setFuncionarios(rows)
+        setLoading(false)
       })
       .catch(error => {
-        setError(error.message);
-        setLoading(false);
+        setError(error.message)
+        setLoading(false)
       });
-  }, [])
+
+      setReqFunc(false)
+  }, [reqFunc])
 
   if(loading) return (<h1>Carregando Funcionários...</h1>)
   if(error) return (<h1>Error: {error}</h1>)

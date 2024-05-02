@@ -5,7 +5,7 @@ export async function GET() {
   try {
     const [vendas] = await 
     database.execute<Venda[]>(`
-      SELECT * FROM mostrar_vendas
+      SELECT * FROM mostrar_vendas ORDER BY data_venda DESC
     `)
 
     const [funcs] = await 

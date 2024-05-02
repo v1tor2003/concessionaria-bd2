@@ -33,6 +33,7 @@ export default function Carros() {
   const [isDeleteOpen, setIsDeleteOpen] = useState<boolean>(false)
   const [data, setData] = useState<Inputs>()
   const [selectedId, setSelectedId] = useState<string>('')
+  const [reqCarros, setReqCarros] = useState<boolean>(true)
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<Inputs>({
     resolver: zodResolver(FormAddCarSchema)
@@ -42,17 +43,20 @@ export default function Carros() {
     await addCar(data)
     reset()
     closeModal()
+    setReqCarros(true)
   }
 
   const processEdit: SubmitHandler<Inputs> = async (data) => {
     await editCar(selectedId, data)
     reset()
     closeEditModal()
+    setReqCarros(true)
   }
 
   const processDelete = async () => {
     await deleteCar(selectedId)
     closeDeleteModal()
+    setReqCarros(true)
   }
 
   const showModal = () => {
@@ -115,7 +119,7 @@ export default function Carros() {
         if (!response.ok) {
           throw new Error('Erro ao pegar carros')
         }
-        return response.json();
+        return response.json()
       })
       .then(({ carros, cores }) => {
         console.log(carros, cores)
@@ -127,7 +131,9 @@ export default function Carros() {
         setError(error.message)
         setLoading(false)
       })
-  }, [])
+
+      setReqCarros(false)
+  }, [reqCarros])
 
   if(loading) return (<h1>Carregando Carros...</h1>)
   if(error) return (<h1>Error: {error}</h1>)
