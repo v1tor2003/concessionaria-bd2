@@ -1,6 +1,6 @@
 'use server'
+import { Func } from "@/app/lib/types"
 import database from "@/database/database"
-import { Func } from "../auth/[...nextauth]/route"
 
 export async function POST(req: Request) {
   const body = await req.json()
