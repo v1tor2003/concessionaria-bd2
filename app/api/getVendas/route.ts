@@ -10,7 +10,7 @@ export async function GET() {
 
     const [funcs] = await 
     database.execute<FuncDetails[]>(`
-      SELECT * FROM mostrar_func
+      SELECT * FROM mostrar_funcs
     `)
     
     return Response.json({vendas, funcs})  

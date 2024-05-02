@@ -14,6 +14,8 @@ export async function addCar(data: Inputs) {
   if(result.error) return { success: false, error: result.error.format() }
 
   const params = Object.values(result.data)
+  console.log(params)
+ 
   try{
     await database.execute(`
       CALL adicionar_carro (?,?,?,?,?,?)

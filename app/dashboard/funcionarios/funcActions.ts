@@ -66,7 +66,7 @@ export async function getFuncById(id: string): Promise<FuncDetails | undefined> 
     // call pegar_func_id
     const [rows] = await database.execute<FuncDetails[]>(`
       SELECT *
-      FROM mostrar_func
+      FROM mostrar_funcs
       WHERE id_func = ?
     `, [id])
     

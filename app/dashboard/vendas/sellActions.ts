@@ -59,7 +59,6 @@ export async function editSell(id: string, data: Inputs){
 
 export async function getSellById(id: number): Promise<VendaInfo | undefined> {
   try {
-    // call venda_por_id
     const [results, fields] = await database.execute<VendaInfo[]>(`
       CALL pegar_venda_id (?)
     `, [id])
